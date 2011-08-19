@@ -1,9 +1,8 @@
-/**
- * A bare bones Sprite and sprite Group example.
+/*
+ * jsdashboard
  *
- * We move a lot of Ship sprites across the screen with varying speed. The sprites
- * rotate themselves randomly. The sprites bounce back from the bottom of the
- * screen.
+ * Prototyping the javascript based dashboard.
+ *
  */
 
 var gamejs = require('gamejs');
@@ -58,23 +57,37 @@ Signal_Right.prototype.update = function(msDuration) {
 /*** Switch Left Button ***/
 var Switch_Left = function(rect) {
     Switch_Left.superConstructor.apply(this, arguments);
-    this.image = gamejs.image.load("media/signal_right.png");
+    this.image = gamejs.image.load("media/switch_button.png");
     this.rect = new gamejs.Rect(rect);
 
     return this;
 };
 // inherit (actually: set prototype)
-gamejs.utils.objects.extend(Signal_Right, gamejs.sprite.Sprite);
-Signal_Right.prototype.update = function(msDuration) {
+gamejs.utils.objects.extend(Switch_Left, gamejs.sprite.Sprite);
+Switch_Left.prototype.update = function(msDuration) {
     // moveIp = move in place
     this.rect.moveIp(0, 0);
 };
 
+/*** Switch Right Button ***/
+var Switch_Right = function(rect) {
+    Switch_Right.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/switch_button.png");
+    this.rect = new gamejs.Rect(rect);
 
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Switch_Right, gamejs.sprite.Sprite);
+Switch_Right.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
 
-var Hazard = function(rect) {
+/*** Switch Hazard Button ***/
+var Switch_Hazard = function(rect) {
     // call superconstructor
-    Hazard.superConstructor.apply(this, arguments);
+    Switch_Hazard.superConstructor.apply(this, arguments);
     this.image = gamejs.image.load("media/switch_button.png");
     this.rect = new gamejs.Rect(rect);
 
@@ -82,50 +95,80 @@ var Hazard = function(rect) {
 };
 
 // inherit (actually: set prototype)
-gamejs.utils.objects.extend(Hazard, gamejs.sprite.Sprite);
-Hazard.prototype.update = function(msDuration) {
+gamejs.utils.objects.extend(Switch_Hazard, gamejs.sprite.Sprite);
+Switch_Hazard.prototype.update = function(msDuration) {
     // moveIp = move in place
     this.rect.moveIp(0, 0);
 };
 
-var Blink = function(rect) {
-    // call superconstructor
-    Blink.superConstructor.apply(this, arguments);
-    this.image = gamejs.image.load("media/switch_button.png");
-    this.rect = new gamejs.Rect(rect);
-
-    return this;
-};
-
-// inherit (actually: set prototype)
-gamejs.utils.objects.extend(Blink, gamejs.sprite.Sprite);
-Blink.prototype.update = function(msDuration) {
-    // moveIp = move in place
-    this.rect.moveIp(0, 0);
-};
+/*** main function ***/
 
 function main() {
 
     var instructionFont = new gamejs.font.Font('20px monospace');
-    var trainSound = new gamejs.mixer.Sound('media/switch_click.ogg');
+    var sound_click = new gamejs.mixer.Sound('media/switch_click.ogg');
+    var sound_signal = new gamejs.mixer.Sound('media/signal_sound.ogg');
+
     var loop_counter = 0;
+
+    var state_signal_left = false
+    var state_signal_right = false
+    var state_signal_hazard = false
 
     function handleEvent(event) {
 	switch(event.type) {
         case gamejs.event.MOUSE_UP:
-	    console.log(event.pos[0]);
-	    console.log(event.pos[1]);
-	    console.log(hazard.rect.left);
-	    console.log(hazard.rect.right);
-	    console.log(hazard.rect.top);
-	    console.log(hazard.rect.bottom);
+	    if ((event.pos[0] > switch_left.rect.left) &&
+		(event.pos[0] < switch_left.rect.right) &&
+		(event.pos[1] > switch_left.rect.top) &&
+		(event.pos[1] < switch_left.rect.bottom)) {
 
+		sound_click.play();
 
-	    if ((event.pos[0] > hazard.rect.left) &&
-		(event.pos[0] < hazard.rect.right) &&
-		(event.pos[1] > hazard.rect.top) &&
-		(event.pos[1] < hazard.rect.bottom)) {
-		trainSound.play();
+		if (state_signal_left == false) {
+		    state_signal_left = true;
+		    state_signal_right = false;
+		    state_signal_hazard = false;
+		} else if (state_signal_left == true) {
+		    state_signal_left = false;
+		    state_signal_right = false;
+		    state_signal_hazard = false;
+		};
+	    };
+
+	    if ((event.pos[0] > switch_right.rect.left) &&
+		(event.pos[0] < switch_right.rect.right) &&
+		(event.pos[1] > switch_right.rect.top) &&
+		(event.pos[1] < switch_right.rect.bottom)) {
+		sound_click.play();
+
+		if (state_signal_right == false) {
+		    state_signal_left = false;
+		    state_signal_right = true;
+		    state_signal_hazard = false;
+		} else if (state_signal_right == true) {
+		    state_signal_left = false;
+		    state_signal_right = false;
+		    state_signal_hazard = false;
+		};
+
+	    };
+
+	    if ((event.pos[0] > switch_hazard.rect.left) &&
+		(event.pos[0] < switch_hazard.rect.right) &&
+		(event.pos[1] > switch_hazard.rect.top) &&
+		(event.pos[1] < switch_hazard.rect.bottom)) {
+		sound_click.play();
+
+		if (state_signal_hazard == false) {
+		    state_signal_left = false;
+		    state_signal_right = false;
+		    state_signal_hazard = true;
+		} else if (state_signal_hazard == true) {
+		    state_signal_left = false;
+		    state_signal_right = false;
+		    state_signal_hazard = false;
+		};
 	    };
 	    
             break;
@@ -139,8 +182,13 @@ function main() {
     // create some background sprites and put them in a group
     // doesn't have to be sprite..
     var background = new Background([0, 0]);
-    var hazard = new Hazard([400, 240, 48, 48]);
-    var blink = new Blink([400, 160, 48, 48]);
+
+    var switch_left = new Switch_Left([480, 240, 48, 48]);
+    var switch_right = new Switch_Right([480, 290, 48, 48]);
+    var switch_hazard = new Switch_Hazard([480, 340, 48, 48]);
+
+    var signal_left = new Signal_Left([360, 160, 48, 48]);
+    var signal_right = new Signal_Right([440, 160, 48, 48]);
 
     // game loop
     var mainSurface = gamejs.display.getSurface();
@@ -155,21 +203,38 @@ function main() {
 	});
 	
         mainSurface.fill("#FFFFFF");
-        // update and draw the backgrounds
+
+	// update the positions
         background.update(msDuration);
-	hazard.update(msDuration);
-        blink.update(msDuration);
+        switch_left.update(msDuration);
+        switch_right.update(msDuration);
+        switch_hazard.update(msDuration);
+        signal_left.update(msDuration);
+        signal_right.update(msDuration);
 
+	// draw the positions
         background.draw(mainSurface);
-        hazard.draw(mainSurface);
+        switch_left.draw(mainSurface);
+        switch_right.draw(mainSurface);
+        switch_hazard.draw(mainSurface);
 
+	if (state_signal_hazard) {
+            signal_left.draw(mainSurface);
+            signal_right.draw(mainSurface);
+	} else if (state_signal_left) {
+            signal_left.draw(mainSurface);
+	} else if (state_signal_right) {
+            signal_right.draw(mainSurface);
+	}
+
+/*
 	if (loop_counter < 20) {
-            blink.draw(mainSurface);
+            signal_left.draw(mainSurface);
+            signal_right.draw(mainSurface);
 	} else if (loop_counter == 40) {
 	    loop_counter = 0;
 	};
-
-
+*/
 
 	mainSurface.blit(instructionFont.render(
 	    "i love myself", '#0fffff'), [20, 20]);
