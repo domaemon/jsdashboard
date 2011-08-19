@@ -8,9 +8,7 @@
 
 var gamejs = require('gamejs');
 
-/**
- * The ship Sprite has a randomly rotated image und moves with random speed (upwards).
- */
+/*** Background Image ***/
 var Background = function(rect) {
     // call superconstructor
     Background.superConstructor.apply(this, arguments);
@@ -19,7 +17,6 @@ var Background = function(rect) {
 
     return this;
 };
-
 // inherit (actually: set prototype)
 gamejs.utils.objects.extend(Background, gamejs.sprite.Sprite);
 Background.prototype.update = function(msDuration) {
@@ -27,10 +24,58 @@ Background.prototype.update = function(msDuration) {
     this.rect.moveIp(0, 0);
 };
 
+
+/*** Left Signal ***/
+var Signal_Left = function(rect) {
+    Signal_Left.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/signal_left.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Signal_Left, gamejs.sprite.Sprite);
+Signal_Left.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+/*** Right Signal ***/
+var Signal_Right = function(rect) {
+    Signal_Right.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/signal_right.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Signal_Right, gamejs.sprite.Sprite);
+Signal_Right.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+/*** Switch Left Button ***/
+var Switch_Left = function(rect) {
+    Switch_Left.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/signal_right.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Signal_Right, gamejs.sprite.Sprite);
+Signal_Right.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+
+
 var Hazard = function(rect) {
     // call superconstructor
     Hazard.superConstructor.apply(this, arguments);
-    this.image = gamejs.image.load("media/hazard.png");
+    this.image = gamejs.image.load("media/switch_button.png");
     this.rect = new gamejs.Rect(rect);
 
     return this;
@@ -46,7 +91,7 @@ Hazard.prototype.update = function(msDuration) {
 var Blink = function(rect) {
     // call superconstructor
     Blink.superConstructor.apply(this, arguments);
-    this.image = gamejs.image.load("media/blink.png");
+    this.image = gamejs.image.load("media/switch_button.png");
     this.rect = new gamejs.Rect(rect);
 
     return this;
@@ -62,7 +107,7 @@ Blink.prototype.update = function(msDuration) {
 function main() {
 
     var instructionFont = new gamejs.font.Font('20px monospace');
-    var trainSound = new gamejs.mixer.Sound('media/probe_shields.ogg');
+    var trainSound = new gamejs.mixer.Sound('media/switch_click.ogg');
     var loop_counter = 0;
 
     function handleEvent(event) {
@@ -136,7 +181,11 @@ function main() {
  * M A I N
  */
 gamejs.preload(['media/background.jpg']);
-gamejs.preload(['media/hazard.png']);
-gamejs.preload(['media/blink.png']);
-gamejs.preload(['media/probe_shields.ogg']);
+
+gamejs.preload(['media/signal_right.png']);
+gamejs.preload(['media/signal_left.png']);
+gamejs.preload(['media/signal_sound.ogg']);
+
+gamejs.preload(['media/switch_button.png']);
+gamejs.preload(['media/switch_click.ogg']);
 gamejs.ready(main);
