@@ -140,6 +140,7 @@ function main() {
 		(event.pos[0] < switch_right.rect.right) &&
 		(event.pos[1] > switch_right.rect.top) &&
 		(event.pos[1] < switch_right.rect.bottom)) {
+
 		sound_click.play();
 
 		if (state_signal_right == false) {
@@ -158,6 +159,7 @@ function main() {
 		(event.pos[0] < switch_hazard.rect.right) &&
 		(event.pos[1] > switch_hazard.rect.top) &&
 		(event.pos[1] < switch_hazard.rect.bottom)) {
+
 		sound_click.play();
 
 		if (state_signal_hazard == false) {
@@ -218,28 +220,28 @@ function main() {
         switch_right.draw(mainSurface);
         switch_hazard.draw(mainSurface);
 
-	if (state_signal_hazard) {
-            signal_left.draw(mainSurface);
-            signal_right.draw(mainSurface);
-	} else if (state_signal_left) {
-            signal_left.draw(mainSurface);
-	} else if (state_signal_right) {
-            signal_right.draw(mainSurface);
-	}
+	if (loop_counter < 15) {
 
-/*
-	if (loop_counter < 20) {
-            signal_left.draw(mainSurface);
-            signal_right.draw(mainSurface);
-	} else if (loop_counter == 40) {
+	    if (state_signal_hazard) {
+		signal_left.draw(mainSurface);
+		signal_right.draw(mainSurface);
+	    } else if (state_signal_left) {
+		signal_left.draw(mainSurface);
+	    } else if (state_signal_right) {
+		signal_right.draw(mainSurface);
+	    }
+	} else if (loop_counter == 30) {
 	    loop_counter = 0;
+
+	    if (state_signal_hazard || state_signal_left | state_signal_right) {
+		sound_click.play();
+	    };
 	};
-*/
 
 	mainSurface.blit(instructionFont.render(
-	    "i love myself", '#0fffff'), [20, 20]);
+	    "i need to believe in myself", '#0fffff'), [50, 50]);
     };
-    gamejs.time.fpsCallback(main_tick, this, 20);
+    gamejs.time.fpsCallback(main_tick, this, 30);
 }
 
 /**
