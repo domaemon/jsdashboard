@@ -101,6 +101,18 @@ Switch_Hazard.prototype.update = function(msDuration) {
     this.rect.moveIp(0, 0);
 };
 
+
+/*** collide_with_cur ***/
+
+function collide_with_cur (pos, rect) {
+
+    if ((pos[0] < rect.right) && (pos[0] > rect.left) &&
+	(pos[1] > rect.top) && (pos[1] < rect.bottom)) {
+	return true;
+    };
+    return false;
+};
+
 /*** main function ***/
 
 function main() {
@@ -118,13 +130,9 @@ function main() {
     function handleEvent(event) {
 	switch(event.type) {
         case gamejs.event.MOUSE_UP:
-	    if ((event.pos[0] > switch_left.rect.left) &&
-		(event.pos[0] < switch_left.rect.right) &&
-		(event.pos[1] > switch_left.rect.top) &&
-		(event.pos[1] < switch_left.rect.bottom)) {
 
+	    if (collide_with_cur (event.pos, switch_left.rect)) {
 		sound_click.play();
-
 		if (state_signal_left == false) {
 		    state_signal_left = true;
 		    state_signal_right = false;
@@ -136,13 +144,8 @@ function main() {
 		};
 	    };
 
-	    if ((event.pos[0] > switch_right.rect.left) &&
-		(event.pos[0] < switch_right.rect.right) &&
-		(event.pos[1] > switch_right.rect.top) &&
-		(event.pos[1] < switch_right.rect.bottom)) {
-
+	    if (collide_with_cur (event.pos, switch_right.rect)) {
 		sound_click.play();
-
 		if (state_signal_right == false) {
 		    state_signal_left = false;
 		    state_signal_right = true;
@@ -152,16 +155,10 @@ function main() {
 		    state_signal_right = false;
 		    state_signal_hazard = false;
 		};
-
 	    };
 
-	    if ((event.pos[0] > switch_hazard.rect.left) &&
-		(event.pos[0] < switch_hazard.rect.right) &&
-		(event.pos[1] > switch_hazard.rect.top) &&
-		(event.pos[1] < switch_hazard.rect.bottom)) {
-
+	    if (collide_with_cur (event.pos, switch_hazard.rect)) {
 		sound_click.play();
-
 		if (state_signal_hazard == false) {
 		    state_signal_left = false;
 		    state_signal_right = false;
@@ -221,7 +218,7 @@ function main() {
         switch_hazard.draw(mainSurface);
 
 	if (loop_counter < 15) {
-
+	    // 0 < loop_counter < 15, the signal is shown.
 	    if (state_signal_hazard) {
 		signal_left.draw(mainSurface);
 		signal_right.draw(mainSurface);
