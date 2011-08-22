@@ -105,7 +105,7 @@ Switch_Hazard.prototype.update = function(msDuration) {
 var Wiper = function(rect) {
     // call superconstructor
     Wiper.superConstructor.apply(this, arguments);
-    this.image = gamejs.image.load("media/switch_button.png");
+    this.origImage = gamejs.image.load("media/switch_button.png");
     this.rect = new gamejs.Rect(rect);
 
     return this;
@@ -115,7 +115,7 @@ var Wiper = function(rect) {
 gamejs.utils.objects.extend(Wiper, gamejs.sprite.Sprite);
 Wiper.prototype.update = function(msDuration) {
     // moveIp = move in place
-    this.image = gamejs.transform.rotate(this.image, parseInt(90 * Math.random()));
+    this.image = gamejs.transform.rotate(this.origImage, parseInt(90 * Math.random()));
 };
 
 
