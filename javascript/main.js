@@ -101,6 +101,23 @@ Switch_Hazard.prototype.update = function(msDuration) {
     this.rect.moveIp(0, 0);
 };
 
+/*** Wiper ***/
+var Wiper = function(rect) {
+    // call superconstructor
+    Wiper.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/switch_button.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Wiper, gamejs.sprite.Sprite);
+Wiper.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.image = gamejs.transform.rotate(this.image, parseInt(90 * Math.random()));
+};
+
 
 /*** collide_with_cur ***/
 
@@ -186,6 +203,8 @@ function main() {
     var switch_right = new Switch_Right([480, 290, 48, 48]);
     var switch_hazard = new Switch_Hazard([480, 340, 48, 48]);
 
+    var wiper = new Wiper([400, 80, 48, 48]);
+
     var signal_left = new Signal_Left([360, 160, 48, 48]);
     var signal_right = new Signal_Right([440, 160, 48, 48]);
 
@@ -210,12 +229,14 @@ function main() {
         switch_hazard.update(msDuration);
         signal_left.update(msDuration);
         signal_right.update(msDuration);
+	wiper.update(msDuration);
 
 	// draw the positions
         background.draw(mainSurface);
         switch_left.draw(mainSurface);
         switch_right.draw(mainSurface);
         switch_hazard.draw(mainSurface);
+	wiper.draw(mainSurface);
 
 	if (loop_counter < 15) {
 	    // 0 < loop_counter < 15, the signal is shown.
