@@ -257,7 +257,7 @@ function check_wiper_switch (state_wiper, pos, rect_slow, rect_normal, rect_fast
 
 function main() {
 
-    var instructionFont = new gamejs.font.Font('20px monospace');
+    var instructionFont = new gamejs.font.Font('20px');
     var sound_click = new gamejs.mixer.Sound('media/switch_click.ogg');
     var sound_signal = new gamejs.mixer.Sound('media/signal_sound.ogg');
 
@@ -367,7 +367,7 @@ function main() {
 	};
 
 	mainSurface.blit(instructionFont.render(
-	    "i need to believe in myself", '#0fffff'), [50, 50]);
+	    "i am not going there.", '#0fffff'), [50, 50]);
     };
     gamejs.time.fpsCallback(main_tick, this, 30);
 }
