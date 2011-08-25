@@ -7,6 +7,20 @@
 
 var gamejs = require('gamejs');
 
+const STATE_SIGNAL_OFF = 0;
+const STATE_SIGNAL_LEFT = 1;
+const STATE_SIGNAL_RIGHT = 2;
+const STATE_SIGNAL_HAZARD = 3;
+
+const STATE_WIPER_OFF = 0;
+const STATE_WIPER_SLOW = 1;
+const STATE_WIPER_NORMAL = 2;
+const STATE_WIPER_FAST = 3;
+
+var state_signal = STATE_SIGNAL_OFF;
+var state_wiper = STATE_WIPER_OFF;
+
+
 /*** Background Image ***/
 var Background = function(rect) {
     // call superconstructor
@@ -101,6 +115,55 @@ Switch_Hazard.prototype.update = function(msDuration) {
     this.rect.moveIp(0, 0);
 };
 
+
+/*********************************/
+
+/*** Switch Slow Button ***/
+var Switch_Slow = function(rect) {
+    Switch_Slow.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/switch_button.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Switch_Slow, gamejs.sprite.Sprite);
+Switch_Slow.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+/*** Switch Normal Button ***/
+var Switch_Normal = function(rect) {
+    Switch_Normal.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/switch_button.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Switch_Normal, gamejs.sprite.Sprite);
+Switch_Normal.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+/*** Switch Fast Button ***/
+var Switch_Fast = function(rect) {
+    Switch_Fast.superConstructor.apply(this, arguments);
+    this.image = gamejs.image.load("media/switch_button.png");
+    this.rect = new gamejs.Rect(rect);
+
+    return this;
+};
+// inherit (actually: set prototype)
+gamejs.utils.objects.extend(Switch_Fast, gamejs.sprite.Sprite);
+Switch_Fast.prototype.update = function(msDuration) {
+    // moveIp = move in place
+    this.rect.moveIp(0, 0);
+};
+
+
 /*** Wiper ***/
 var Wiper = function(rect) {
     // call superconstructor
@@ -113,21 +176,81 @@ var Wiper = function(rect) {
 
 // inherit (actually: set prototype)
 gamejs.utils.objects.extend(Wiper, gamejs.sprite.Sprite);
-Wiper.prototype.update = function(msDuration) {
+Wiper.prototype.update = function(msDuration, angle, factor) {
     // moveIp = move in place
-    this.image = gamejs.transform.rotate(this.origImage, parseInt(90 * Math.random()));
+    this.image = gamejs.transform.rotate(this.origImage, angle * 2 * (factor + 1));
 };
 
+// check if the signal switch was pressed.
+function check_signal_switch (state_signal, pos, rect_left, rect_right, rect_hazard) {
 
-/*** collide_with_cur ***/
+    if ((pos[0] < rect_left.right) && (pos[0] > rect_left.left) &&
+	(pos[1] > rect_left.top) && (pos[1] < rect_left.bottom)) {
 
-function collide_with_cur (pos, rect) {
-
-    if ((pos[0] < rect.right) && (pos[0] > rect.left) &&
-	(pos[1] > rect.top) && (pos[1] < rect.bottom)) {
-	return true;
+	if (state_signal == STATE_SIGNAL_LEFT) {
+	    return STATE_SIGNAL_OFF;
+	} else {
+	    return STATE_SIGNAL_LEFT;
+	}
     };
-    return false;
+
+    if ((pos[0] < rect_right.right) && (pos[0] > rect_right.left) &&
+	(pos[1] > rect_right.top) && (pos[1] < rect_right.bottom)) {
+
+	if (state_signal == STATE_SIGNAL_RIGHT) {
+	    return STATE_SIGNAL_OFF;
+	} else {
+	    return STATE_SIGNAL_RIGHT;
+	}
+    };
+
+    if ((pos[0] < rect_hazard.right) && (pos[0] > rect_hazard.left) &&
+	(pos[1] > rect_hazard.top) && (pos[1] < rect_hazard.bottom)) {
+
+	if (state_signal == STATE_SIGNAL_HAZARD) {
+	    return STATE_SIGNAL_OFF;
+	} else {
+	    return STATE_SIGNAL_HAZARD;
+	}
+    };
+
+    return state_signal;
+};
+
+// check if the wiper switch was pressed.
+function check_wiper_switch (state_wiper, pos, rect_slow, rect_normal, rect_fast) {
+
+
+    if ((pos[0] < rect_slow.right) && (pos[0] > rect_slow.left) &&
+	(pos[1] > rect_slow.top) && (pos[1] < rect_slow.bottom)) {
+
+	if (state_wiper == STATE_WIPER_SLOW) {
+	    return STATE_WIPER_OFF;
+	} else {
+	    return STATE_WIPER_SLOW;
+	}
+    };
+
+    if ((pos[0] < rect_normal.right) && (pos[0] > rect_normal.left) &&
+	(pos[1] > rect_normal.top) && (pos[1] < rect_normal.bottom)) {
+
+	if (state_wiper == STATE_WIPER_NORMAL) {
+	    return STATE_WIPER_OFF;
+	} else {
+	    return STATE_WIPER_NORMAL;
+	}
+    };
+
+    if ((pos[0] < rect_fast.right) && (pos[0] > rect_fast.left) &&
+	(pos[1] > rect_fast.top) && (pos[1] < rect_fast.bottom)) {
+
+	if (state_wiper == STATE_WIPER_FAST) {
+	    return STATE_WIPER_OFF;
+	} else {
+	    return STATE_WIPER_FAST;
+	}
+    };
+    return state_wiper;
 };
 
 /*** main function ***/
@@ -140,52 +263,17 @@ function main() {
 
     var loop_counter = 0;
 
-    var state_signal_left = false
-    var state_signal_right = false
-    var state_signal_hazard = false
-
     function handleEvent(event) {
 	switch(event.type) {
         case gamejs.event.MOUSE_UP:
 
-	    if (collide_with_cur (event.pos, switch_left.rect)) {
-		sound_click.play();
-		if (state_signal_left == false) {
-		    state_signal_left = true;
-		    state_signal_right = false;
-		    state_signal_hazard = false;
-		} else if (state_signal_left == true) {
-		    state_signal_left = false;
-		    state_signal_right = false;
-		    state_signal_hazard = false;
-		};
-	    };
+	    // checking which signal button was pressed
+	    state_signal = check_signal_switch 
+	    (state_signal, event.pos, switch_left.rect, switch_right.rect, switch_hazard.rect);
 
-	    if (collide_with_cur (event.pos, switch_right.rect)) {
-		sound_click.play();
-		if (state_signal_right == false) {
-		    state_signal_left = false;
-		    state_signal_right = true;
-		    state_signal_hazard = false;
-		} else if (state_signal_right == true) {
-		    state_signal_left = false;
-		    state_signal_right = false;
-		    state_signal_hazard = false;
-		};
-	    };
-
-	    if (collide_with_cur (event.pos, switch_hazard.rect)) {
-		sound_click.play();
-		if (state_signal_hazard == false) {
-		    state_signal_left = false;
-		    state_signal_right = false;
-		    state_signal_hazard = true;
-		} else if (state_signal_hazard == true) {
-		    state_signal_left = false;
-		    state_signal_right = false;
-		    state_signal_hazard = false;
-		};
-	    };
+	    // checking which wiper button was pressed
+	    state_wiper = check_wiper_switch
+	    (state_wiper, event.pos, switch_slow.rect, switch_normal.rect, switch_fast.rect);
 	    
             break;
 	};
@@ -199,11 +287,15 @@ function main() {
     // doesn't have to be sprite..
     var background = new Background([0, 0]);
 
-    var switch_left = new Switch_Left([480, 240, 48, 48]);
-    var switch_right = new Switch_Right([480, 290, 48, 48]);
-    var switch_hazard = new Switch_Hazard([480, 340, 48, 48]);
+    var switch_left = new Switch_Left([320, 240, 48, 48]);
+    var switch_right = new Switch_Right([320, 290, 48, 48]);
+    var switch_hazard = new Switch_Hazard([320, 340, 48, 48]);
 
-    var wiper = new Wiper([400, 80, 48, 48]);
+    var switch_slow = new Switch_Slow([480, 240, 48, 48]);
+    var switch_normal = new Switch_Normal([480, 290, 48, 48]);
+    var switch_fast = new Switch_Fast([480, 340, 48, 48]);
+
+    var wiper = new Wiper([400, 80]);
 
     var signal_left = new Signal_Left([360, 160, 48, 48]);
     var signal_right = new Signal_Right([440, 160, 48, 48]);
@@ -224,34 +316,51 @@ function main() {
 
 	// update the positions
         background.update(msDuration);
+
         switch_left.update(msDuration);
         switch_right.update(msDuration);
         switch_hazard.update(msDuration);
+
+        switch_slow.update(msDuration);
+        switch_normal.update(msDuration);
+        switch_fast.update(msDuration);
+
         signal_left.update(msDuration);
         signal_right.update(msDuration);
-	wiper.update(msDuration);
+	wiper.update(msDuration, loop_counter, state_wiper);
 
 	// draw the positions
         background.draw(mainSurface);
+
         switch_left.draw(mainSurface);
         switch_right.draw(mainSurface);
         switch_hazard.draw(mainSurface);
-	wiper.draw(mainSurface);
+
+        switch_slow.draw(mainSurface);
+        switch_normal.draw(mainSurface);
+        switch_fast.draw(mainSurface);
+
+	// drawing the wiper
+	if (state_wiper != STATE_WIPER_OFF) {
+	    wiper.draw(mainSurface);
+	};
 
 	if (loop_counter < 15) {
 	    // 0 < loop_counter < 15, the signal is shown.
-	    if (state_signal_hazard) {
+	    if (state_signal == STATE_SIGNAL_OFF) {
+	    } else if (state_signal == STATE_SIGNAL_HAZARD) {
 		signal_left.draw(mainSurface);
 		signal_right.draw(mainSurface);
-	    } else if (state_signal_left) {
+	    } else if (state_signal == STATE_SIGNAL_LEFT) {
 		signal_left.draw(mainSurface);
-	    } else if (state_signal_right) {
+	    } else if (state_signal == STATE_SIGNAL_RIGHT) {
 		signal_right.draw(mainSurface);
-	    }
+	    };
+
 	} else if (loop_counter == 30) {
 	    loop_counter = 0;
 
-	    if (state_signal_hazard || state_signal_left | state_signal_right) {
+	    if (state_signal != STATE_SIGNAL_OFF) {
 		sound_click.play();
 	    };
 	};
