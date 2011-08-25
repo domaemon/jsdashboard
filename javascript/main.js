@@ -327,6 +327,7 @@ function main() {
 
         signal_left.update(msDuration);
         signal_right.update(msDuration);
+
 	wiper.update(msDuration, loop_counter, state_wiper);
 
 	// draw the positions
