@@ -17,6 +17,12 @@ const STATE_WIPER_SLOW = 1;
 const STATE_WIPER_NORMAL = 2;
 const STATE_WIPER_FAST = 3;
 
+const OFFSETX_SWITCH_SIGNAL = 70
+const OFFSETX_SWITCH_WIPER = 680
+const OFFSETX_SIGNAL_LEFT = 320
+const OFFSETX_SIGNAL_RIGHT = 430
+const OFFSETY_SIGNAL = 320
+
 var state_signal = STATE_SIGNAL_OFF;
 var state_wiper = STATE_WIPER_OFF;
 
@@ -168,7 +174,7 @@ Switch_Fast.prototype.update = function(msDuration) {
 var Wiper = function(rect) {
     // call superconstructor
     Wiper.superConstructor.apply(this, arguments);
-    this.origImage = gamejs.image.load("media/switch_button.png");
+    this.origImage = gamejs.image.load("media/wiper.png");
     this.rect = new gamejs.Rect(rect);
 
     return this;
@@ -287,18 +293,18 @@ function main() {
     // doesn't have to be sprite..
     var background = new Background([0, 0]);
 
-    var switch_left = new Switch_Left([320, 240, 48, 48]);
-    var switch_right = new Switch_Right([320, 290, 48, 48]);
-    var switch_hazard = new Switch_Hazard([320, 340, 48, 48]);
+    var switch_left = new Switch_Left([OFFSETX_SWITCH_SIGNAL, 240, 48, 48]);
+    var switch_right = new Switch_Right([OFFSETX_SWITCH_SIGNAL, 290, 48, 48]);
+    var switch_hazard = new Switch_Hazard([OFFSETX_SWITCH_SIGNAL, 340, 48, 48]);
 
-    var switch_slow = new Switch_Slow([480, 240, 48, 48]);
-    var switch_normal = new Switch_Normal([480, 290, 48, 48]);
-    var switch_fast = new Switch_Fast([480, 340, 48, 48]);
+    var switch_slow = new Switch_Slow([OFFSETX_SWITCH_WIPER, 240, 48, 48]);
+    var switch_normal = new Switch_Normal([OFFSETX_SWITCH_WIPER, 290, 48, 48]);
+    var switch_fast = new Switch_Fast([OFFSETX_SWITCH_WIPER, 340, 48, 48]);
 
     var wiper = new Wiper([400, 80]);
 
-    var signal_left = new Signal_Left([360, 160, 48, 48]);
-    var signal_right = new Signal_Right([440, 160, 48, 48]);
+    var signal_left = new Signal_Left([OFFSETX_SIGNAL_LEFT, OFFSETY_SIGNAL, 48, 48]);
+    var signal_right = new Signal_Right([OFFSETX_SIGNAL_RIGHT, OFFSETY_SIGNAL, 48, 48]);
 
     // game loop
     var mainSurface = gamejs.display.getSurface();
@@ -383,4 +389,7 @@ gamejs.preload(['media/signal_sound.ogg']);
 
 gamejs.preload(['media/switch_button.png']);
 gamejs.preload(['media/switch_click.ogg']);
+
+gamejs.preload(['media/wiper.png']);
+
 gamejs.ready(main);
